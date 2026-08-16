@@ -109,3 +109,18 @@ joblib.dump(
 print(
     "Logistic Regression model saved successfully."
 )
+# ============================================================
+# SAVE SCALER
+# ============================================================
+
+scaler_path = os.path.join(
+    os.path.dirname(__file__),
+    "scaler.pkl"
+)
+
+joblib.dump(
+    scaler,
+    scaler_path
+)
+
+print("Scaler saved successfully.")
