@@ -17,7 +17,6 @@ from sklearn.metrics import (
 )
 
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 
 
 # ============================================================
@@ -32,17 +31,17 @@ st.set_page_config(
 
 
 # ============================================================
-# TITLE
+# APPLICATION TITLE
 # ============================================================
 
 st.title("💳 Credit Card Fraud Detection")
 
 st.markdown(
     """
-    ## Machine Learning Classification Dashboard
+    ### Machine Learning Classification Dashboard
 
-    This application demonstrates five machine learning
-    classification models for detecting fraudulent
+    This interactive application demonstrates five machine
+    learning classification models for detecting fraudulent
     credit card transactions.
 
     **Models implemented:**
@@ -57,7 +56,7 @@ st.markdown(
 
 
 # ============================================================
-# LOAD DATASET FROM KAGGLE
+# LOAD DATASET
 # ============================================================
 
 @st.cache_data
@@ -79,13 +78,13 @@ def load_dataset():
     return data
 
 
-with st.spinner("Loading dataset from Kaggle..."):
+with st.spinner("Loading Credit Card Fraud dataset..."):
 
     df = load_dataset()
 
 
 # ============================================================
-# PREPARE DATA
+# FEATURES AND TARGET
 # ============================================================
 
 X = df.drop(
@@ -110,32 +109,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 
 # ============================================================
-# SCALE TIME AND AMOUNT
-# ============================================================
-
-scaler = StandardScaler()
-
-X_train_scaled = X_train.copy()
-X_test_scaled = X_test.copy()
-
-X_train_scaled[
-    ["Time", "Amount"]
-] = scaler.fit_transform(
-    X_train[
-        ["Time", "Amount"]
-    ]
-)
-
-X_test_scaled[
-    ["Time", "Amount"]
-] = scaler.transform(
-    X_test[
-        ["Time", "Amount"]
-    ]
-)
-
-
-# ============================================================
 # CREATE TEST DATA
 # ============================================================
 
@@ -149,13 +122,50 @@ test_csv = test_data.to_csv(
 
 
 # ============================================================
+# LOAD SAVED SCALER
+# ============================================================
+
+scaler_path = os.path.join(
+    "model",
+    "scaler.pkl"
+)
+
+
+if not os.path.exists(scaler_path):
+
+    st.error(
+        "scaler.pkl was not found inside the model folder."
+    )
+
+    st.stop()
+
+
+scaler = joblib.load(
+    scaler_path
+)
+
+
+# ============================================================
+# SCALE TEST DATA
+# ============================================================
+
+X_test_scaled = X_test.copy()
+
+X_test_scaled[
+    ["Time", "Amount"]
+] = scaler.transform(
+    X_test[
+        ["Time", "Amount"]
+    ]
+)
+
+
+# ============================================================
 # LOAD SAVED MODELS
 # ============================================================
 
 @st.cache_resource
 def load_models():
-
-    models = {}
 
     model_files = {
 
@@ -176,23 +186,28 @@ def load_models():
     }
 
 
-    for model_name, file_path in model_files.items():
+    loaded_models = {}
 
-        if not os.path.exists(file_path):
+
+    for model_name, model_path in model_files.items():
+
+        if not os.path.exists(model_path):
 
             st.error(
-                f"Model file not found: {file_path}"
+                f"Model file not found: {model_path}"
             )
 
             st.stop()
 
 
-        models[model_name] = joblib.load(
-            file_path
+        loaded_models[
+            model_name
+        ] = joblib.load(
+            model_path
         )
 
 
-    return models
+    return loaded_models
 
 
 models = load_models()
@@ -208,7 +223,7 @@ def evaluate_model(
 ):
 
     # Logistic Regression and KNN
-    # use scaled features
+    # were trained using scaled data.
 
     if model_name in [
         "Logistic Regression",
@@ -223,8 +238,8 @@ def evaluate_model(
             X_test_scaled
         )[:, 1]
 
-    # Tree-based and Naive Bayes models
-    # use original features
+    # Decision Tree, Naive Bayes and
+    # Random Forest use original features.
 
     else:
 
@@ -282,6 +297,161 @@ def evaluate_model(
 
 
 # ============================================================
+# GENERATE DYNAMIC MODEL OBSERVATION
+# ============================================================
+
+def generate_model_observation(
+    model_name,
+    row,
+    results_df
+):
+
+    observations = []
+
+
+    # --------------------------------------------------------
+    # FIND BEST METRICS
+    # --------------------------------------------------------
+
+    metric_columns = {
+
+        "Accuracy": "Accuracy",
+
+        "AUC": "AUC",
+
+        "Precision": "Precision",
+
+        "Recall": "Recall",
+
+        "F1 Score": "F1 Score",
+
+        "MCC": "MCC"
+    }
+
+
+    best_metrics = []
+
+
+    for metric_name, column in metric_columns.items():
+
+        if row[column] == results_df[column].max():
+
+            best_metrics.append(
+                metric_name
+            )
+
+
+    # --------------------------------------------------------
+    # BEST METRIC OBSERVATION
+    # --------------------------------------------------------
+
+    if best_metrics:
+
+        observations.append(
+            "Best in "
+            + ", ".join(best_metrics)
+        )
+
+
+    # --------------------------------------------------------
+    # PRECISION OBSERVATION
+    # --------------------------------------------------------
+
+    precision_median = results_df[
+        "Precision"
+    ].median()
+
+
+    if row["Precision"] >= precision_median:
+
+        observations.append(
+            "strong Precision"
+        )
+
+    else:
+
+        observations.append(
+            "lower Precision"
+        )
+
+
+    # --------------------------------------------------------
+    # RECALL OBSERVATION
+    # --------------------------------------------------------
+
+    recall_median = results_df[
+        "Recall"
+    ].median()
+
+
+    if row["Recall"] >= recall_median:
+
+        observations.append(
+            "strong Recall"
+        )
+
+    else:
+
+        observations.append(
+            "lower Recall"
+        )
+
+
+    # --------------------------------------------------------
+    # F1 SCORE OBSERVATION
+    # --------------------------------------------------------
+
+    f1_median = results_df[
+        "F1 Score"
+    ].median()
+
+
+    if row["F1 Score"] >= f1_median:
+
+        observations.append(
+            "good balance between Precision and Recall"
+        )
+
+    else:
+
+        observations.append(
+            "weaker balance between Precision and Recall"
+        )
+
+
+    # --------------------------------------------------------
+    # FALSE POSITIVE OBSERVATION
+    # --------------------------------------------------------
+
+    if row["Precision"] < 0.50:
+
+        observations.append(
+            "higher risk of false-positive predictions"
+        )
+
+
+    # --------------------------------------------------------
+    # FRAUD DETECTION OBSERVATION
+    # --------------------------------------------------------
+
+    if row["Recall"] < 0.70:
+
+        observations.append(
+            "lower fraud detection capability"
+        )
+
+
+    # --------------------------------------------------------
+    # RETURN OBSERVATION
+    # --------------------------------------------------------
+
+    return (
+        ". ".join(observations)
+        + "."
+    )
+
+
+# ============================================================
 # SIDEBAR
 # ============================================================
 
@@ -300,8 +470,19 @@ page = st.sidebar.radio(
 )
 
 
+st.sidebar.markdown("---")
+
+st.sidebar.write(
+    "Credit Card Fraud Detection"
+)
+
+st.sidebar.write(
+    "Machine Learning Classification Project"
+)
+
+
 # ============================================================
-# 1. DATASET OVERVIEW
+# DATASET OVERVIEW
 # ============================================================
 
 if page == "Dataset Overview":
@@ -312,7 +493,7 @@ if page == "Dataset Overview":
 
 
     # --------------------------------------------------------
-    # KEY DATASET INFORMATION
+    # KEY DATASET METRICS
     # --------------------------------------------------------
 
     col1, col2, col3, col4 = st.columns(4)
@@ -364,9 +545,9 @@ if page == "Dataset Overview":
 
         • 1 = Fraudulent transaction
 
-        The dataset is highly imbalanced, with fraudulent
-        transactions representing approximately 0.17% of
-        all transactions.
+        The dataset is highly imbalanced because fraudulent
+        transactions represent approximately 0.17% of all
+        transactions.
         """
     )
 
@@ -392,6 +573,7 @@ if page == "Dataset Overview":
     st.subheader(
         "Class Distribution"
     )
+
 
     class_counts = df[
         "Class"
@@ -427,7 +609,7 @@ if page == "Dataset Overview":
 
 
     # --------------------------------------------------------
-    # TRAIN / TEST INFORMATION
+    # TRAIN / TEST SPLIT
     # --------------------------------------------------------
 
     st.subheader(
@@ -460,17 +642,51 @@ if page == "Dataset Overview":
 
 
     # --------------------------------------------------------
-    # TEST DATA DOWNLOAD
+    # TEST CLASS DISTRIBUTION
     # --------------------------------------------------------
 
     st.subheader(
-        "Test Data"
+        "Test Data Distribution"
     )
+
+
+    test_class_counts = y_test.value_counts()
+
+
+    test_distribution = pd.DataFrame({
+
+        "Transaction Type": [
+            "Normal",
+            "Fraud"
+        ],
+
+        "Count": [
+            int(test_class_counts.get(0, 0)),
+            int(test_class_counts.get(1, 0))
+        ]
+    })
+
+
+    st.dataframe(
+        test_distribution,
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+    # --------------------------------------------------------
+    # DOWNLOAD TEST DATA
+    # --------------------------------------------------------
+
+    st.subheader(
+        "Download Test Data"
+    )
+
 
     st.write(
         """
-        The test data contains the same 56,962 transactions
-        used for model evaluation.
+        Download the test dataset used for evaluating
+        all five classification models.
         """
     )
 
@@ -491,6 +707,7 @@ if page == "Dataset Overview":
         "Dataset Statistics"
     )
 
+
     st.dataframe(
         df.describe().T,
         use_container_width=True
@@ -498,7 +715,7 @@ if page == "Dataset Overview":
 
 
 # ============================================================
-# 2. MODEL COMPARISON
+# MODEL COMPARISON
 # ============================================================
 
 elif page == "Model Comparison":
@@ -510,11 +727,15 @@ elif page == "Model Comparison":
 
     st.write(
         """
-        The five classification models are evaluated on
+        All five classification models are evaluated on
         the same test dataset using the required metrics.
         """
     )
 
+
+    # --------------------------------------------------------
+    # CALCULATE RESULTS
+    # --------------------------------------------------------
 
     results = []
 
@@ -541,7 +762,7 @@ elif page == "Model Comparison":
 
 
     # --------------------------------------------------------
-    # RESULTS TABLE
+    # MODEL COMPARISON TABLE
     # --------------------------------------------------------
 
     st.subheader(
@@ -550,6 +771,7 @@ elif page == "Model Comparison":
 
 
     formatted_results = results_df.copy()
+
 
     metric_columns = [
         "Accuracy",
@@ -565,7 +787,9 @@ elif page == "Model Comparison":
 
         formatted_results[column] = (
             formatted_results[column]
-            .map(lambda x: f"{x:.6f}")
+            .map(
+                lambda x: f"{x:.6f}"
+            )
         )
 
 
@@ -577,7 +801,7 @@ elif page == "Model Comparison":
 
 
     # --------------------------------------------------------
-    # METRIC SELECTION
+    # METRIC COMPARISON CHART
     # --------------------------------------------------------
 
     st.subheader(
@@ -607,7 +831,7 @@ elif page == "Model Comparison":
 
 
     # --------------------------------------------------------
-    # BEST MODEL
+    # BEST MODEL FOR SELECTED METRIC
     # --------------------------------------------------------
 
     best_index = results_df[
@@ -635,31 +859,129 @@ elif page == "Model Comparison":
 
 
     # --------------------------------------------------------
-    # OVERALL OBSERVATION
+    # DYNAMIC OBSERVATIONS
     # --------------------------------------------------------
 
     st.subheader(
-        "Overall Observation"
+        "Observations About Model Performance"
+    )
+
+
+    observations = []
+
+
+    for _, row in results_df.iterrows():
+
+        observation = generate_model_observation(
+            row["Model"],
+            row,
+            results_df
+        )
+
+
+        observations.append({
+
+            "ML Model Name":
+                row["Model"],
+
+            "Observation about model performance":
+                observation
+        })
+
+
+    observations_df = pd.DataFrame(
+        observations
+    )
+
+
+    st.dataframe(
+        observations_df,
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+    # --------------------------------------------------------
+    # OVERALL WINNER
+    # --------------------------------------------------------
+
+    st.subheader(
+        "Overall Winner for Your Dataset"
+    )
+
+
+    # F1 Score and MCC are used as the
+    # primary indicators because the
+    # dataset is highly imbalanced.
+
+    results_df["Overall Score"] = (
+        results_df["F1 Score"]
+        +
+        results_df["MCC"]
+    ) / 2
+
+
+    winner_index = results_df[
+        "Overall Score"
+    ].idxmax()
+
+
+    overall_winner = results_df.loc[
+        winner_index,
+        "Model"
+    ]
+
+
+    winner_f1 = results_df.loc[
+        winner_index,
+        "F1 Score"
+    ]
+
+
+    winner_mcc = results_df.loc[
+        winner_index,
+        "MCC"
+    ]
+
+
+    winner_score = results_df.loc[
+        winner_index,
+        "Overall Score"
+    ]
+
+
+    st.success(
+        f"🏆 Overall Winner: {overall_winner}"
     )
 
 
     st.write(
+        f"""
+        Based on the combined F1 Score and MCC,
+        **{overall_winner}** achieved the strongest
+        overall classification performance.
+
+        **F1 Score:** {winner_f1:.6f}
+
+        **MCC:** {winner_mcc:.6f}
+
+        **Combined F1/MCC Score:** {winner_score:.6f}
         """
-        Random Forest provides the best overall performance
-        across the important classification metrics.
+    )
 
-        It achieves the highest Accuracy, Precision, Recall,
-        F1 Score and MCC.
 
-        Gaussian Naive Bayes achieves the highest AUC, but
-        its Precision and F1 Score are considerably lower,
-        indicating a high number of false-positive predictions.
+    st.info(
+        """
+        Since the dataset is highly imbalanced, Accuracy
+        alone should not be used to select the best model.
+        Precision, Recall, F1 Score, AUC and MCC are also
+        considered.
         """
     )
 
 
 # ============================================================
-# 3. INDIVIDUAL MODEL
+# INDIVIDUAL MODEL
 # ============================================================
 
 elif page == "Individual Model":
@@ -668,6 +990,10 @@ elif page == "Individual Model":
         "🔍 Individual Model Evaluation"
     )
 
+
+    # --------------------------------------------------------
+    # MODEL SELECTION
+    # --------------------------------------------------------
 
     selected_model = st.selectbox(
         "Select Classification Model",
@@ -836,7 +1162,7 @@ elif page == "Individual Model":
 
 
     # --------------------------------------------------------
-    # CONFUSION MATRIX DETAILS
+    # CONFUSION MATRIX VALUES
     # --------------------------------------------------------
 
     st.subheader(
@@ -935,7 +1261,7 @@ elif page == "Individual Model":
 
 
 # ============================================================
-# 4. FRAUD PREDICTION
+# FRAUD PREDICTION
 # ============================================================
 
 elif page == "Fraud Prediction":
@@ -947,11 +1273,11 @@ elif page == "Fraud Prediction":
 
     st.info(
         """
-        The V1 to V28 features are anonymized PCA-transformed
-        features from the original dataset.
+        The V1 to V28 attributes are anonymized
+        PCA-transformed features from the original dataset.
 
-        You can either select a real transaction from the test
-        dataset or enter feature values manually.
+        You can either select a real transaction from the
+        test dataset or enter feature values manually.
         """
     )
 
@@ -972,7 +1298,7 @@ elif page == "Fraud Prediction":
 
 
     # --------------------------------------------------------
-    # SELECT INPUT METHOD
+    # INPUT METHOD
     # --------------------------------------------------------
 
     input_method = st.radio(
@@ -1118,7 +1444,7 @@ elif page == "Fraud Prediction":
 
 
     # --------------------------------------------------------
-    # PREDICT BUTTON
+    # PREDICTION BUTTON
     # --------------------------------------------------------
 
     if st.button(
@@ -1127,7 +1453,9 @@ elif page == "Fraud Prediction":
     ):
 
 
-        # Scale input for Logistic Regression and KNN
+        # ----------------------------------------------------
+        # SCALE INPUT FOR LOGISTIC REGRESSION / KNN
+        # ----------------------------------------------------
 
         input_scaled = input_df.copy()
 
@@ -1140,6 +1468,10 @@ elif page == "Fraud Prediction":
             ]
         )
 
+
+        # ----------------------------------------------------
+        # MAKE PREDICTION
+        # ----------------------------------------------------
 
         if selected_model in [
             "Logistic Regression",
@@ -1155,7 +1487,6 @@ elif page == "Fraud Prediction":
                 input_scaled
             )[0]
 
-
         else:
 
             prediction = model.predict(
@@ -1169,7 +1500,7 @@ elif page == "Fraud Prediction":
 
 
         # ----------------------------------------------------
-        # RESULT
+        # DISPLAY PREDICTION
         # ----------------------------------------------------
 
         st.subheader(
@@ -1247,7 +1578,7 @@ elif page == "Fraud Prediction":
 
 
         # ----------------------------------------------------
-        # PROBABILITIES
+        # PREDICTION PROBABILITY
         # ----------------------------------------------------
 
         st.subheader(

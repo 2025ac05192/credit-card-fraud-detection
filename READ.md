@@ -2,11 +2,22 @@
 
 ## a. Problem Statement
 
-Credit card fraud is a major challenge in the financial sector because fraudulent transactions can result in significant financial losses for customers and financial institutions. The objective of this project is to develop and compare machine learning classification models for detecting fraudulent credit card transactions.
+Credit card fraud is a major challenge in the financial sector. Detecting fraudulent transactions accurately is important to reduce financial losses and protect customers.
 
-The project uses the Credit Card Fraud Detection dataset and implements multiple classification algorithms on the same dataset. The models are evaluated using Accuracy, AUC Score, Precision, Recall, F1 Score, and Matthews Correlation Coefficient (MCC).
+The objective of this project is to implement and compare multiple machine learning classification models for detecting fraudulent credit card transactions.
 
-An interactive Streamlit web application is also developed to demonstrate the trained models, compare their performance, visualize evaluation results, and predict whether a transaction is normal or fraudulent.
+The models are trained and evaluated using the same Credit Card Fraud Detection dataset.
+
+The following evaluation metrics are used:
+
+- Accuracy
+- AUC Score
+- Precision
+- Recall
+- F1 Score
+- Matthews Correlation Coefficient (MCC)
+
+An interactive Streamlit web application has also been developed to demonstrate the models, compare their performance, visualize evaluation results, and predict whether a transaction is normal or fraudulent.
 
 ---
 
@@ -18,72 +29,91 @@ An interactive Streamlit web application is also developed to demonstrate the tr
 
 ### Dataset Source
 
-Kaggle — Credit Card Fraud Detection dataset by Machine Learning Group - ULB.
+The dataset is obtained from Kaggle.
 
-Dataset URL:
+Kaggle Dataset:
 
 https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud
 
-### Dataset Characteristics
+### Dataset Size
 
-| Property                |               Value |
-| ----------------------- | ------------------: |
-| Total Instances         |             284,807 |
-| Input Features          |                  30 |
-| Target Variable         |               Class |
-| Number of Classes       |                   2 |
-| Normal Transactions     |             284,315 |
-| Fraudulent Transactions |                 492 |
-| Fraud Percentage        | Approximately 0.17% |
+| Property | Value |
+|---|---:|
+| Total Instances | 284,807 |
+| Input Features | 30 |
+| Target Variable | Class |
+| Number of Classes | 2 |
+| Normal Transactions | 284,315 |
+| Fraudulent Transactions | 492 |
 
-The dataset contains transactions made by European cardholders during September 2013.
+### Target Variable
 
-The target variable is `Class`:
+The target variable is `Class`.
 
-* `0` → Normal transaction
-* `1` → Fraudulent transaction
+- `0` = Normal transaction
+- `1` = Fraudulent transaction
 
-The dataset contains the following main features:
+### Features
 
-* `Time` — elapsed time between transactions
-* `V1` to `V28` — anonymized PCA-transformed transaction features
-* `Amount` — transaction amount
-* `Class` — target variable
+The dataset contains:
 
-The dataset is highly imbalanced because fraudulent transactions represent only approximately 0.17% of all transactions. Therefore, Accuracy alone is not sufficient to determine the best model. Precision, Recall, F1 Score, AUC and MCC are also considered.
+- `Time`
+- `V1` to `V28`
+- `Amount`
+
+`V1` to `V28` are anonymized PCA-transformed features.
+
+`Time` represents the time elapsed between transactions.
+
+`Amount` represents the transaction amount.
+
+### Class Imbalance
+
+The dataset is highly imbalanced.
+
+Only approximately 0.17% of the transactions are fraudulent.
+
+Therefore, Accuracy alone is not sufficient to evaluate the models. Precision, Recall, F1 Score, AUC and MCC are also considered.
 
 ### Data Preprocessing
 
 The following preprocessing steps were performed:
 
-1. The target variable `Class` was separated from the input features.
-2. The dataset was divided into training and testing sets using an 80:20 split.
-3. Stratified sampling was used to preserve the fraud-to-normal transaction ratio in both datasets.
-4. The `Time` and `Amount` features were standardized for Logistic Regression and KNN.
-5. Tree-based models and Gaussian Naive Bayes were trained using the original feature values.
-6. The test set contains 56,962 transactions, including 98 fraudulent transactions.
+1. The `Class` column was separated as the target variable.
+2. The dataset was divided into training and testing datasets.
+3. An 80:20 stratified train-test split was used.
+4. Stratification was used to preserve the class distribution in both datasets.
+5. `Time` and `Amount` were standardized for Logistic Regression and KNN.
+6. The remaining models were trained using the original feature values.
+
+The resulting test dataset contains:
+
+- 56,962 transactions
+- 56,864 normal transactions
+- 98 fraudulent transactions
 
 ---
 
 ## c. Github Repository Link
 
 **GitHub Repository:**
-[Add your GitHub Repository Link here]
+
+https://github.com/2025ac05192/credit-card-fraud-detection
 
 The repository contains:
 
-* Complete source code
-* Jupyter Notebook containing the experiments and analysis
-* Streamlit application
-* `requirements.txt`
-* `README.md`
-* Test data used in the experiments
+- Complete Streamlit source code
+- Source code for all implemented models
+- Saved trained model files
+- Test data
+- Requirements file
+- README documentation
 
 ---
 
 ## d. Models Used
 
-The following five classification models were implemented using the same Credit Card Fraud Detection dataset:
+The following classification models were implemented using the same dataset:
 
 1. Logistic Regression
 2. Decision Tree Classifier
@@ -91,236 +121,197 @@ The following five classification models were implemented using the same Credit 
 4. Gaussian Naive Bayes Classifier
 5. Random Forest Classifier (Ensemble Model)
 
-> **Note:** The assignment wording mentions six models, but the provided model list contains five models. Therefore, this implementation follows the five models explicitly specified in the assignment.
+### Note
+
+The assignment description mentions six models in one section, while the explicitly provided list contains five models. This project implements all five models listed in the required model list.
 
 ---
 
-## Model Comparison
+# Model Comparison
 
-The following table presents the evaluation results obtained on the test dataset.
+All five classification models were evaluated on the same test dataset using the following metrics:
 
-| ML Model Name            |     Accuracy |      AUC |    Precision |       Recall |           F1 |          MCC |
-| ------------------------ | -----------: | -------: | -----------: | -----------: | -----------: | -----------: |
-| Logistic Regression      |     0.999157 | 0.955898 |     0.828947 |     0.642857 |     0.724138 |     0.729596 |
-| Decision Tree            |     0.999140 | 0.872238 |     0.752577 |     0.744898 |     0.748718 |     0.748297 |
-| KNN                      |     0.999544 | 0.943756 |     0.918605 |     0.806122 |     0.858696 |     0.860305 |
-| Gaussian Naive Bayes     |     0.992276 | 0.967731 |     0.137712 |     0.663265 |     0.228070 |     0.299951 |
-| Random Forest (Ensemble) | **0.999596** | 0.963027 | **0.941176** | **0.816327** | **0.874317** | **0.876337** |
+- Accuracy
+- AUC Score
+- Precision
+- Recall
+- F1 Score
+- Matthews Correlation Coefficient (MCC)
 
-### Observations About Model Performance
-
-#### Logistic Regression
-
-Logistic Regression achieved an accuracy of 99.9157% and an AUC of 95.59%. Its precision was 82.89%, while recall was 64.29%.
-
-The model performed well overall but missed a relatively larger proportion of fraudulent transactions compared with KNN and Random Forest. Its F1 Score of 72.41% and MCC of 72.96% indicate moderate performance for this highly imbalanced fraud detection problem.
-
-#### Decision Tree
-
-The Decision Tree achieved an accuracy of 99.9140%, with an AUC of 87.22%. It achieved a precision of 75.26% and recall of 74.49%.
-
-Compared with Logistic Regression, the Decision Tree provided slightly better recall but lower AUC and precision. Its F1 Score was 74.87% and MCC was 74.83%, showing reasonable but not the best overall performance.
-
-#### KNN
-
-K-Nearest Neighbors achieved an accuracy of 99.9544%, an AUC of 94.38%, precision of 91.86%, and recall of 80.61%.
-
-Its F1 Score of 85.87% and MCC of 86.03% show that KNN performed very well in identifying fraudulent transactions while maintaining a relatively low number of false positives.
-
-KNN was the second strongest model overall based on the F1 Score and MCC.
-
-#### Gaussian Naive Bayes
-
-Gaussian Naive Bayes achieved the highest AUC of **96.77%**, which was the highest among all five models.
-
-However, its precision was only 13.77%, resulting in a very low F1 Score of 22.81% and MCC of 29.99%. This indicates that the model classified a large number of legitimate transactions as fraudulent.
-
-Therefore, despite having the highest AUC, Gaussian Naive Bayes was not the best model for the final classification decision.
-
-#### Random Forest (Ensemble)
-
-Random Forest achieved the highest overall performance among the five models.
-
-It obtained:
-
-* Accuracy: **99.9596%**
-* Precision: **94.12%**
-* Recall: **81.63%**
-* F1 Score: **87.43%**
-* MCC: **87.63%**
-* AUC: **96.30%**
-
-Random Forest provided the best balance between detecting fraudulent transactions and avoiding false-positive predictions.
-
-It achieved the highest Accuracy, Precision, Recall, F1 Score, and MCC among the five models. Therefore, Random Forest was selected as the **overall best-performing model** for this dataset.
-
+The model comparison below was generated after evaluating the saved trained models on the test dataset.
+--------------------------------------------------------------------------------------------------------------
+| ML Model Name            | Accuracy     | AUC        | Precision    | Recall     | F1         | MCC        |
+|--------------------------|----------    |------------|--------------|------------|------------|------------|
+| Logistic Regression      | 0.999157     | 0.955898   | 0.828947     | 0.642857   | 0.724138   | 0.729596   |
+| Decision Tree            | 0.999140     | 0.872238   | 0.752577     | 0.744898   | 0.748718   | 0.748297   |
+| K-Nearest Neighbor       | 0.999544     | 0.943756   | 0.918605     | 0.806122   | 0.858696   | 0.860305   |
+| Gaussian Naive Bayes     | 0.992276     |**0.967731**| 0.137712     | 0.663265   | 0.228070   | 0.299951   |
+| Random Forest (Ensemble) | **0.999596** | 0.963027   | **0.941176** |**0.816327**|**0.874317**|**0.876337**|
+--------------------------------------------------------------------------------------------------------------
 ---
 
-## Overall Winner for the Dataset
+# Observations About Model Performance
 
-### **Random Forest (Ensemble)**
+| ML Model Name | Observation about model performance |                                                                                     
+|-------------------------|---|
+| **Logistic Regression** |Achieved very high Accuracy of 99.9157% and an AUC of 95.59%. Precision was 82.89%, while Recall was 64.29 %  |was      .                     The model performed well overall but had a comparatively lower Recall and F1 Score than KNN and Random     
 
-Random Forest is the overall winner because it provides the best balance across the most important classification metrics.
+Forest.     
+The model performed well overall but had a comparatively lower Recall and F1 Score than KNN and Random Forest. |
+| **Decision Tree** | Achieved 99.9140% Accuracy and 87.22% AUC. Recall was 74.49% and F1 Score was 74.87%. The model provided reasonable fraud detection performance but had lower AUC and Precision compared with the stronger models. |
+| **K-Nearest Neighbor** | Achieved 99.9544% Accuracy, 91.86% Precision, 80.61% Recall, 85.87% F1 Score and 86.03% MCC. It performed strongly and provided a good balance between Precision and Recall. |
+| **Gaussian Naive Bayes** | Achieved the highest AUC of 96.77%. However, Precision was only 13.77%, resulting in a low F1 Score of 22.81% and MCC of 29.9951%. This indicates a high number of false-positive predictions despite its strong AUC. |
+| **Random Forest (Ensemble)** | Achieved the highest Accuracy (99.9596%), Precision (94.12%), Recall (81.63%), F1 Score (87.43%) and MCC (87.63%). It provided the best overall balance between detecting fraudulent transactions and minimizing false-positive predictions. |
+| **Overall Winner for your dataset?** | **Random Forest (Ensemble)** was the overall best-performing model. It achieved the highest Accuracy, Precision, Recall, F1 Score and MCC among all five models. |
 
-Although Gaussian Naive Bayes achieved the highest AUC, its very low precision and F1 Score indicate that it generated many false-positive predictions.
 
-Random Forest achieved the highest MCC of **0.876337**, which is particularly useful for this highly imbalanced dataset. It also achieved the highest F1 Score of **0.874317**, precision of **0.941176**, and recall of **0.816327**.
-
-Therefore, based on the overall evaluation, **Random Forest is the most suitable model among the evaluated models for this credit card fraud detection problem.**
-
+--------------------------------------------------------------------------------------------------------------------------------------------
+|  ML Model Name                 |                         Observation about Model Performance  | |
+---------------------------------------------------------------------------------------------------------------------------------------------
+Logistic Regression | Achieved very high Accuracy of 99.9157% and an AUC of 95.59%. Precision was 82.89%, while Recall was 64.29%. The model performed well overall but had comparatively lower Recall and F1 Score than KNN and Random Forest.
+--------------------------------------------------------------------------------------------------------------------------------------------
+Decision Tree       | Achieved 99.9140% Accuracy and 87.22% AUC. Recall was 74.49% and F1 Score was 74.87%. It provided reasonable fraud detection performance but had lower AUC and Precision compared with the stronger models.
+--------------------------------------------------------------------------------------------------------------------------------------------
+K-Nearest Neighbor   | Achieved 99.9544% Accuracy, 91.86% Precision, 80.61% Recall, 85.87% F1 Score and 86.03% MCC. It performed strongly and provided a good balance between Precision and Recall.
+--------------------------------------------------------------------------------------------------------------------------------------------
+Gaussian Naive Bayes | Achieved the highest AUC of 96.77%. However, Precision was only 13.77%, resulting in a low F1 Score of 22.81% and MCC of 29.9951%. This indicates a high number of false-positive predictions despite its strong AUC.
+---------------------------------------------------------------------------------------------------------------------------------------------
+Random Forest (Ensemble) |Achieved the highest Accuracy (99.9596%), Precision (94.12%), Recall (81.63%), F1 Score (87.43%) and MCC (87.63%). It provided the best overall balance between detecting fraudulent transactions and minimizing false-positive predictions.
+-----------------------------------------------------------------------------------------------------------------------------------------------
 ---
 
-## Streamlit Web Application
+
+# Observations About Model Performance
+
+| ML Model Name           | Observation about model performance                                                                            |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------|
+| **Logistic Regression** | Achieved very high Accuracy of 99.9157% and an AUC of 95.59%. Precision was 82.89%, while Recall was 64.29%. The model performed well overall but had a comparatively lower Recall and F1 Score than KNN and Random Forest.                                     |
+-----------------------------------------------------------------------------------------------------------------------------------------------|
+| **Decision Tree** | Achieved 99.9140% Accuracy and 87.22% AUC. Recall was 74.49% and F1 Score was 74.87%. The model provided reasonable fraud detection performance but had lower AUC and Precision compared with the stronger models.                                                       |
+-----------------------------------------------------------------------------------------------------------------------------------------------|
+| **K-Nearest Neighbor** | Achieved 99.9544% Accuracy, 91.86% Precision, 80.61% Recall, 85.87% F1 Score and 86.03% MCC. It performed strongly and provided a good balance between Precision and Recall.                                                                                      |
+-----------------------------------------------------------------------------------------------------------------------------------------------|
+| **Gaussian Naive Bayes** | Achieved the highest AUC of 96.77%. However, Precision was only 13.77%, resulting in a low F1 Score of 22.81% and MCC of 29.9951%. This indicates a high number of false-positive predictions despite its strong AUC.                                            |
+-----------------------------------------------------------------------------------------------------------------------------------------------|
+| **Random Forest (Ensemble)** | Achieved the highest Accuracy (99.9596%), Precision (94.12%), Recall (81.63%), F1 Score (87.43%) and MCC (87.63%). It provided the best overall balance between detecting fraudulent transactions and minimizing false-positive predictions.                |
+-----------------------------------------------------------------------------------------------------------------------------------------------|
+| **Overall Winner for your dataset?** | **Random Forest (Ensemble)** was the overall best-performing model. It achieved the highest Accuracy, Precision, Recall, F1 Score and MCC among all five models.                                                                                     |
+-----------------------------------------------------------------------------------------------------------------------------------------------|
+
+# Overall Winner
+
+## Random Forest (Ensemble)
+
+Based on the evaluation results, **Random Forest** was selected as the overall best-performing model for the Credit Card Fraud Detection dataset.
+
+Its performance was:
+
+| Metric | Score |
+|---|---:|
+| Accuracy | **0.999596** |
+| AUC | 0.963027 |
+| Precision | **0.941176** |
+| Recall | **0.816327** |
+| F1 Score | **0.874317** |
+| MCC | **0.876337** |
+
+Random Forest achieved the highest Accuracy, Precision, Recall, F1 Score and MCC among the five implemented models.
+
+Although Gaussian Naive Bayes achieved the highest AUC of 0.967731, its Precision, F1 Score and MCC were considerably lower. Therefore, AUC alone was not used to determine the overall winner.
+
+Since the dataset is highly imbalanced, **F1 Score, Precision, Recall and MCC** are particularly important when selecting the most suitable fraud detection model.
+
+Therefore, **Random Forest (Ensemble) is considered the overall winner for this dataset.**
+---
+
+# Streamlit Web Application
 
 An interactive Streamlit application was developed to demonstrate the classification models.
 
-The application provides the following sections:
+The application contains the following sections.
 
-### 1. Dataset Overview
+## 1. Dataset Overview
 
-Displays:
+The application displays:
 
-* Number of transactions
-* Number of features
-* Number of fraudulent transactions
-* Fraud percentage
-* Dataset preview
-* Class distribution
-* Dataset statistics
+- Total number of transactions
+- Number of input features
+- Number of fraudulent transactions
+- Fraud percentage
+- Dataset preview
+- Class distribution
+- Train-test split information
+- Dataset statistics
+- Download option for `test_data.csv`
 
-### 2. Model Comparison
+## 2. Model Comparison
 
-Users can compare the five classification models using:
+Users can compare all five models using:
 
-* Accuracy
-* AUC
-* Precision
-* Recall
-* F1 Score
-* MCC
+- Accuracy
+- AUC
+- Precision
+- Recall
+- F1 Score
+- MCC
 
-### 3. Individual Model Evaluation
+The application also provides a visual comparison of the selected metric.
+
+## 3. Individual Model Evaluation
 
 Users can select an individual model and view:
 
-* Evaluation metrics
-* Confusion matrix
-* ROC curve
-* AUC score
+- Accuracy
+- AUC
+- Precision
+- Recall
+- F1 Score
+- MCC
+- Confusion Matrix
+- True Positive
+- True Negative
+- False Positive
+- False Negative
+- ROC Curve
 
-### 4. Fraud Prediction
+## 4. Fraud Prediction
 
-Users can select a model and enter transaction feature values. The application predicts whether the transaction is:
+Users can select a classification model and perform a transaction prediction.
 
-* Normal
-* Fraudulent
+The application supports:
 
-The application also displays the prediction probability.
+- Selecting a sample transaction from the test dataset
+- Entering transaction feature values manually
+- Predicting Normal or Fraudulent transaction
+- Displaying prediction probabilities
+- Comparing actual and predicted classes for test transactions
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```text
 Credit-Card-Fraud-Detection/
 │
 ├── app.py
-├── model_training.py
 ├── requirements.txt
 ├── README.md
 ├── test_data.csv
 │
-└── notebooks/
-    └── Credit_Card_Fraud_Analysis.ipynb
-```
-
----
-
-## Technologies Used
-
-* Python
-* Pandas
-* NumPy
-* Scikit-learn
-* Matplotlib
-* Seaborn
-* Streamlit
-* KaggleHub
-* Jupyter Notebook
-
----
-
-## Installation
-
-Clone the repository:
-
-```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-```
-
-Navigate to the project directory:
-
-```bash
-cd Credit-Card-Fraud-Detection
-```
-
-Install the required dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## Running the Streamlit Application
-
-Run the following command:
-
-```bash
-streamlit run app.py
-```
-
-The application will open in the browser at the local Streamlit address.
-
----
-
-## Evaluation Metrics
-
-The following metrics were used to evaluate all classification models:
-
-### Accuracy
-
-Measures the overall percentage of correctly classified transactions.
-
-### AUC
-
-Measures the model's ability to distinguish between normal and fraudulent transactions across different classification thresholds.
-
-### Precision
-
-Measures the proportion of transactions predicted as fraudulent that were actually fraudulent.
-
-### Recall
-
-Measures the proportion of actual fraudulent transactions that were correctly detected.
-
-### F1 Score
-
-Provides a balance between Precision and Recall.
-
-### MCC
-
-Matthews Correlation Coefficient provides a balanced measure of classification quality and is particularly useful for highly imbalanced datasets such as credit card fraud detection.
-
----
-
-## Conclusion
-
-Five machine learning classification models were implemented and evaluated on the Credit Card Fraud Detection dataset.
-
-All models achieved very high accuracy because the dataset is highly imbalanced. Therefore, additional metrics such as Precision, Recall, F1 Score, AUC and MCC were used for a meaningful comparison.
-
-Among the evaluated models, **Random Forest achieved the best overall performance**, with the highest Accuracy, Precision, Recall, F1 Score and MCC.
-
-The project also includes an interactive Streamlit application that allows users to explore the dataset, compare models, view individual model performance, and perform fraud predictions.
-
+└── model/
+    ├── logistic_regression.py
+    ├── logistic_regression.pkl
+    │
+    ├── decision_tree.py
+    ├── decision_tree.pkl
+    │
+    ├── knn.py
+    ├── knn.pkl
+    │
+    ├── naive_bayes.py
+    ├── naive_bayes.pkl
+    │
+    ├── random_forest.py
+    ├── random_forest.pkl
+    │
+    └── scaler.pkl
